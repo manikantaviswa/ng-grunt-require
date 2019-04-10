@@ -1,0 +1,21 @@
+{
+  "name": "react-angular-grunt",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "build": "grunt build",
+    "start": "grunt serve"
+  },
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "devDependencies": {
+    "connect": "^3.6.6",
+    "grunt": "^1.0.2",
+    "grunt-contrib-clean": "^1.1.0",
+    "grunt-contrib-connect": "^2.0.0",
+    "grunt-contrib-requirejs": "^1.0.0",
+    "grunt-contrib-uglify": "^4.0.1",
+    "load-grunt-tasks": "^4.0.0"
+  }
+}
