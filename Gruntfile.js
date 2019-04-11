@@ -66,9 +66,32 @@ module.exports = function (grunt) {
             server: {
                 options: {
                     port: 8080,
-                    hostname: '*',
-                    keepalive: true,
+                    open: true,
+                    livereload: true,
+                    base: '.',
+                    hostname: 'localhost'
                 }
+			}
+        },
+        watch: {
+            options: {
+                livereload: true
+            },
+            js: {
+                files: [
+                    '<%= yeoman.app %>/**/*.js'
+                ],
+                
+            },
+            css: {
+                files: [
+                    '<%= yeoman.app %>/**/*.css'
+                ],
+                options: {
+                    interval: 500,
+                    debounceDelay: 500
+                },
+                tasks: ['sass:server', 'r2:server', 'postcss:server']
             }
         }
     });
@@ -81,9 +104,14 @@ module.exports = function (grunt) {
         ]);
     });
 
-    grunt.registerTask('serve', function () {
+    grunt.registerTask('serve', function (target) {
+        if (target === 'dist') {
+            return grunt.task.run(['build', 'connect:server']);
+        }
+
         grunt.task.run([
-            'connect'
+            'connect:server',
+            'watch'
         ]);
     });
 };

@@ -1,13 +1,18 @@
 <!doctype html>
 <html>
-    <head>
-        <title>React Angular Grunt</title>
-    </head>
 
-    <body ng-controller="myCtrl"  ng-cloak>
-        {{msg}}   
-    </body>
-    <!-- <script type="text/javascript" src="./bower_components/requirejs/require.js" data-main="require-config"></script> -->
-    <!-- <script type="text/javascript" src="./dist/react-angular-grunt.js"></script> -->
+<head>
+    <title>React Angular Grunt</title>
+</head>
+
+<body ng-controller="myCtrl" ng-cloak>
+    {{msg}}
+</body>
+<!--(if target dev)><!-->
+    <script type="text/javascript" src="./bower_components/requirejs/require.js" data-main="require-config"></script>
+<!--<!(endif)-->
+    
+<!--(if target !dev)>
     <script type="text/javascript" src="./dist/react-angular-grunt.min.js"></script>
+<!(endif)-->
 </html>
