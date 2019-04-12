@@ -1,15 +1,19 @@
 module.exports = function (grunt) {
     'use strict';
 
-    require('load-grunt-tasks')(grunt);
-    require('grunt-contrib-connect')(grunt);
+    require('grunt-contrib-clean')(grunt);
+    require('grunt-contrib-requirejs')(grunt);
+    require('grunt-contrib-uglify')(grunt);
     require('connect')(grunt);
+    require('grunt-contrib-connect')(grunt);
+    require('grunt-contrib-watch')(grunt);
+    grunt.loadNpmTasks('grunt-processhtml');
 
     grunt.initConfig({
         yeoman: {
             app: 'app',
             dist: 'dist',
-            indexTplFile: '_index.html',
+            indexTplFile: 'index.tpl.html',
             indexHtmlFile: 'index.html',
             theme: '',
             themePath: ''
@@ -55,6 +59,15 @@ module.exports = function (grunt) {
                 }
             }
         },
+        processhtml: {
+            options: {
+            },
+            dist: {
+                files: {
+                    '<%= yeoman.indexTplFile %>': ['<%= yeoman.indexHtmlFile %>']
+                }
+            }
+        },
         uglify: {
             dist: {
                 files: {
@@ -63,35 +76,67 @@ module.exports = function (grunt) {
             }
         },
         connect: {
-            server: {
+            options: {
+                port: 12345,
+                open: true,
+                hostname: 'localhost',
+                livereload: 35729
+            },
+            livereload: {
                 options: {
-                    port: 8080,
-                    open: true,
-                    livereload: true,
-                    base: '.',
-                    hostname: 'localhost'
+                    open: false,
+                    base: [
+                        '.'
+                    ]
                 }
-			}
+            },
+        },
+        livereload: {
+            options: {
+                livereload: '<%= connect.options.livereload %>',
+                interval: 500,
+                debounceDelay: 500
+            },
+            files: [
+                '<%= yeoman.app %>/**/*.html',
+                '<%= yeoman.app %>/**/*.js'
+            ]
         },
         watch: {
-            options: {
-                livereload: true
-            },
             js: {
                 files: [
                     '<%= yeoman.app %>/**/*.js'
                 ],
-                
+                options: {
+                    livereload: true,
+                    interval: 500,
+                    debounceDelay: 500
+                }
             },
-            css: {
+            index: {
                 files: [
-                    '<%= yeoman.app %>/**/*.css'
+                    '<%= yeoman.indexTplFile %>'
                 ],
                 options: {
                     interval: 500,
                     debounceDelay: 500
                 },
-                tasks: ['sass:server', 'r2:server', 'postcss:server']
+                tasks: ['replace:server-index']
+            },
+            livereload: {
+                options: {
+                    livereload: '<%= connect.options.livereload %>',
+                    interval: 500,
+                    debounceDelay: 500
+                },
+                files: [
+                    '<%= yeoman.app %>/**/*.html',
+                    '<%= yeoman.app %>/**/*.tpl.html',
+                    '<%= yeoman.app %>/data/**/*',
+                    '<%= yeoman.app %>/{,themes/*/}{css,sass}/**/*.{css,sass,scss}',
+                    '<%= yeoman.app %>/images/**/*.{png,jpg,jpeg,gif,webp,svg}',
+                    '!<%= yeoman.app %>bower_components/**/*.html'
+                ]
             }
         }
     });
@@ -100,18 +145,21 @@ module.exports = function (grunt) {
         grunt.task.run([
             'clean:dist',
             'requirejs',
-            'uglify:dist'
+            'uglify:dist',
+            'processhtml',
         ]);
     });
 
     grunt.registerTask('serve', function (target) {
+        console.log('serving on', target);
         if (target === 'dist') {
             return grunt.task.run(['build', 'connect:server']);
         }
 
         grunt.task.run([
-            'connect:server',
-            'watch'
+            'processhtml',
+            'connect:livereload',
+            'watch:js'
         ]);
     });
 };
