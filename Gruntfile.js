@@ -1,15 +1,19 @@
 module.exports = function (grunt) {
     'use strict';
 
-    require('load-grunt-tasks')(grunt);
-    require('grunt-contrib-connect')(grunt);
+    require('grunt-contrib-clean')(grunt);
+    require('grunt-contrib-requirejs')(grunt);
+    require('grunt-contrib-uglify')(grunt);
     require('connect')(grunt);
+    require('grunt-contrib-connect')(grunt);
+    require('grunt-contrib-watch')(grunt);
+    grunt.loadNpmTasks('grunt-processhtml');
 
     grunt.initConfig({
         yeoman: {
             app: 'app',
             dist: 'dist',
-            indexTplFile: '_index.html',
+            indexTplFile: 'index.tpl.html',
             indexHtmlFile: 'index.html',
             theme: '',
             themePath: ''
@@ -55,6 +59,18 @@ module.exports = function (grunt) {
                 }
             }
         },
+        processhtml: {
+            dev: {
+                files: {
+                    'index.html': ['index.tpl.html']
+                }
+            },
+            prod: {
+                files: {
+                    'index.html': ['index.tpl.html']
+                }
+            }
+        },
         uglify: {
             dist: {
                 files: {
@@ -63,12 +79,70 @@ module.exports = function (grunt) {
             }
         },
         connect: {
+            options: {
+                port: 12345,
+                hostname: 'localhost',
+            },
             server: {
                 options: {
-                    port: 8080,
-                    hostname: '*',
-                    keepalive: true,
+                    keepalive: true
                 }
+            },
+            livereload: {
+                options: {
+                    open: true,
+                    livereload: 35729,
+                    open: false,
+                    base: ['.']
+                }
+            },
+        },
+        livereload: {
+            options: {
+                livereload: '<%= connect.options.livereload %>',
+                interval: 500,
+                debounceDelay: 500
+            },
+            files: [
+                '<%= yeoman.app %>/**/*.html',
+                '<%= yeoman.app %>/**/*.js'
+            ]
+        },
+        watch: {
+            js: {
+                files: [
+                    '<%= yeoman.app %>/**/*.js'
+                ],
+                options: {
+                    livereload: true,
+                    interval: 500,
+                    debounceDelay: 500
+                }
+            },
+            index: {
+                files: [
+                    '<%= yeoman.indexTplFile %>'
+                ],
+                options: {
+                    interval: 500,
+                    debounceDelay: 500
+                },
+                tasks: ['']
+            },
+            livereload: {
+                options: {
+                    livereload: '<%= connect.options.livereload %>',
+                    interval: 500,
+                    debounceDelay: 500
+                },
+                files: [
+                    '<%= yeoman.app %>/**/*.html',
+                    '<%= yeoman.app %>/**/*.tpl.html',
+                    '<%= yeoman.app %>/data/**/*',
+                    '<%= yeoman.app %>/{,themes/*/}{css,sass}/**/*.{css,sass,scss}',
+                    '<%= yeoman.app %>/images/**/*.{png,jpg,jpeg,gif,webp,svg}',
+                    '!<%= yeoman.app %>bower_components/**/*.html'
+                ]
             }
         }
     });
@@ -77,13 +151,20 @@ module.exports = function (grunt) {
         grunt.task.run([
             'clean:dist',
             'requirejs',
-            'uglify:dist'
+            'uglify:dist',
         ]);
     });
 
     grunt.registerTask('serve', function () {
+        var target = grunt.option('target') || 'dev';
+        if (target === 'prod') {
+            return grunt.task.run(['processhtml:prod', 'build', 'connect:server']);
+        }
+
         grunt.task.run([
-            'connect'
+            'processhtml:dev',
+            'connect:livereload',
+            'watch:js'
         ]);
     });
 };
