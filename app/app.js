@@ -5,7 +5,7 @@ define([
 
     var module = angular.module('requireNgApp', []);
 
-    module.controller('myCtrl', ['$scope', function($scope) {
+    module.controller('myCtrl', ['$scope', ($scope) => {
         $scope.msg = 'My Controller';
         console.log('inside controller');
     }]);

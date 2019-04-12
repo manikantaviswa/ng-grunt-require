@@ -3,7 +3,7 @@ module.exports = function (grunt) {
 
     require('grunt-contrib-clean')(grunt);
     require('grunt-contrib-requirejs')(grunt);
-    require('grunt-contrib-uglify')(grunt);
+    require('grunt-contrib-uglify-es')(grunt);
     require('connect')(grunt);
     require('grunt-contrib-connect')(grunt);
     require('grunt-contrib-watch')(grunt);
